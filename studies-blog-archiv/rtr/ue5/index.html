@@ -1,0 +1,487 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>Lösung zur Ü5: Multi-Pass Rendering</title>
+            
+        <script src="/studies-blog-archiv/rtr/tdl/base.js"></script>
+        <script src="/studies-blog-archiv/rtr/tdl/gl-matrix.js"></script>
+        <script src="/studies-blog-archiv/rtr/common/jquery-1.7.1.min.js"></script>
+        <script>window.dhx_globalImgPath = "img/";</script>
+        <script src="/studies-blog-archiv/rtr/common/dhtmlxslider/dhtmlxcommon.js"></script>
+        <script src="/studies-blog-archiv/rtr/common/dhtmlxslider/dhtmlxslider.js"></script>
+        <script src="/studies-blog-archiv/rtr/common/dhtmlxslider/dhtmlxslider_start.js"></script>
+        <link rel="STYLESHEET" type="text/css" href="/studies-blog-archiv/rtr/common/dhtmlxslider/dhtmlxslider.css">  
+            
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">        
+        <link rel="stylesheet" type="text/css" href="/studies-blog-archiv/rtr/common/bootstrap/css/bootstrap.min.css">         
+        <link rel="stylesheet" type="text/css" href="/studies-blog-archiv/rtr/common/bootstrap/css/bootstrap-responsive.min.css">
+            
+        <style type="text/css">body {
+                padding-top: 60px;
+                padding-bottom: 40px;
+            }</style>
+            
+        <style type="text/css">#error { display: none; }
+            #canvas { border: 1px solid black; }</style>
+            
+        <script type="text/javascript" src="/studies-blog-archiv/rtr/ue5/entity.js"></script>
+        <script type="text/javascript" src="/studies-blog-archiv/rtr/ue5/index.js"></script>
+    </head>
+        
+    <body>
+    <header class="navbar navbar-fixed-top">
+        <div class="navbar-inner">
+            <div class="container">
+                <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </a> <a class="brand" href="/studies-blog-archiv/2012/04/23/losungen-vl-real-time-rendering/">Aufgaben-Übersicht RTR</a>
+                <div class="nav-collapse">
+                    <ul class="nav">
+                        <li class="active"><a href="/studies-blog-archiv/rtr/ue5/index.html">Aufgabe 5: Multi-Pass Rendering</a></li> 
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="container">
+        <div class="page-header">
+            <h1>Aufgabe 5.D: Bloom</h1>
+        </div>
+            
+        <pre id="error" class="alert alert-error"></pre>
+            
+        <h2>Aufgabenstellung</h2> 
+        <p>Gegenstand dieser Aufgabe ist die selbstständige Recherche, prototypische Implementierung, schriftliche Ausarbeitung
+            und abschliessende Präsentation einer nicht-trivialen Multi-Pass Technik. Entwerfen sie für Ihren Effekt eine
+            geeignete Beispielszene, mit der sie die Besonderheiten des Effekts gut demonstrieren können.
+            Verwenden sie zur Ausgestaltung der Beispielszene auch einige der anderen Techniken die bisher in Vorlesung und Übungen bearbeitet wurden.</p>
+        <div align="center">
+<p><img src="/studies-blog-archiv/rtr/ue5/img/bloom.png" alt="Bloom-Shader Beispielbild" width="50%" height="50%"></p>
+        </div> 
+        <p>Ich setzte mich in dieser Aufgabe mit dem Bloom-Effekt auseinander.</p>
+        <div id="canvas-container">
+            <p><canvas id="canvas" width="800" height="600"></canvas></p>
+        </div>
+            
+        <form class="form-horizontal">
+            <fieldset>
+                <legend>Controls</legend>
+                <div class="row">
+                    <div class="span6">                            
+                        <div class="control-group">                                 
+                            <label for="blurradius" class="control-label">Blur Radius</label>
+                            <div class="controls">                                    
+                                <input type="text" id="blurradius" class="form-inline" style="width:50px">
+                                <br><br><br> 
+                                <script>var slider1 =new dhtmlxSlider(null, 300);
+                                    slider1.attachEvent("onChange", setBlurRadius);
+                                    slider1.linkTo('blurradius');
+                                    slider1.setMax(10);
+                                    slider1.setValue(8);
+                                    slider1.init();</script>
+                            </div>
+                        </div>                          
+                    </div>
+                    <div class="span6">                            
+                        <div class="control-group">
+                            <label for="blurscale" class="control-label">Blur Scale</label>
+                            <div class="controls">           
+                                <input type="text" id="blurscale" class="form-inline" style="width:50px">
+                                <br><br><br> 
+                                <script>var slider1 =new dhtmlxSlider(null, 300);
+                                    slider1.attachEvent("onChange", setBlurScale);
+                                    slider1.linkTo('blurscale');
+                                    slider1.setMax(5);
+                                    slider1.setValue(4);
+                                    slider1.init();</script>
+                            </div>
+                        </div>                           
+                    </div>
+                    <div class="span6">
+                        <div class="control-group">
+                            <label for="blurstrength" class="control-label">Blur Strength</label>
+                            <div class="controls">           
+                                <input type="text" id="blurstrength" class="form-inline" style="width:50px">
+                                <br><br><br> 
+                                <script>var slider1 =new dhtmlxSlider(null, 300);
+                                    slider1.attachEvent("onChange", setBlurStrength);
+                                    slider1.linkTo('blurstrength');
+                                    slider1.setMax(10);                                       
+                                    slider1.setValue(3);
+                                    slider1.init();</script>
+                            </div>
+                        </div>                      
+                    </div>
+                    <div class="span6">
+                        <div class="control-group">
+                            <label for="blurres" class="control-label">BlurMap Resolution</label>
+                            <div class="controls">           
+                                <select id="blurres" autocomplete="off">
+                                    <option>1024 x 1024</option>
+                                    <option>512 x 512</option>
+                                    <option>256 x 256</option>
+                                    <option>128 x 128</option>
+                                    <option>64 x 64</option>	
+                                </select>
+                            </div>
+                        </div>                      
+                    </div>
+                </div>                
+            </fieldset>
+        </form>
+        <ul>           
+            <li>
+<span class="label label-warning">0...5</span> Color, vert. Blur, horiz. Blur, BlurMap, Bloom</li>        
+        </ul>
+            
+            
+        <h2>Erläuterungen zur Übung</h2>
+        <h3>Was ist der Bloom-Effekt?</h3>
+        <p>            
+            Der Bloom-Effekt (auch <em>light bloom</em> oder <em>glow</em>) bezeichnet das Überstrahlen dunkler Bildbereiche in der Nähe sehr heller Lichtquellen (vgl. Abbildung 1) 
+            und simuliert bzw. repoduziert somit Bildartefakte, wie sie auch bei normalen Kameraaufnahmen entstehen können. Das liegt daran begründet, das eine Linse
+            nie perfekt fokussieren kann, sodass zwei benachbarte Punkte, welche einen sehr großen Helligkeitsunterschied haben, leicht verschwimmen und das helle Licht
+            über die dunklere Kante strahlt. Ein weiteres typisches Beispiel (vgl. Abbildung 2) für diesen Effekt ist ein dunkler Raum durch dessen Fenster helles Licht, wie etwa
+            Sonnenschein, fällt. Die Fensterkanten verschwimmen dann scheinbar, da das Licht im Gegensatz zur Helligkeit im Raum sehr hell ist und das Auge diesen Helligkeitsunterschied schwer verarbeiten kann.
+                
+            Eingesetzt wird dieser Effekt in Computerspielen, Demos oder beim <a href="http://en.wikipedia.org/wiki/High_dynamic_range_rendering" target="_blank">High dynamic range rendering</a>.
+        </p>      
+        <div align="center">    
+            <p>
+            </p>
+<table width="100%" height="100%" border="0" cellpadding="30" cellspacing="30">
+                <tr>
+                    <td align="center" width="75%">
+<img src="/studies-blog-archiv/rtr/ue5/img/bloom2.jpg" style="margin:auto;display:block;" alt="Bloom-Shader Beispielbild" width="100%" height="100%" title="Bloom-Shader Beispielbild">Abbildung 1: Das Licht des hellen Hintergrundes verdeckt teils Bereiche im Vordergrund, wie die Wand oder die Figur.</td>
+                    <td align="center" width="100%">
+<img src="/studies-blog-archiv/rtr/ue5/img/bloom.jpg" style="margin:auto;display:block;" alt="Bloom-Shader Beispielbild" width="50%" height="50%" title="Bloom-Shader Beispielbild">Abbildung 2</td>
+                </tr>
+            </table>
+                
+            
+        </div>      
+        <h3>Erstellung des Bloom-Effekts</h3>
+        <p>
+            Die Erstellung des Bloom-Effekts lässt sich grob in drei Schritte aufteilen. Siehe dazu Abbildung 2. Zunächst wird die Szene normal gerendert (a).
+            Anschließend wird auf dieses Ergebnis ein Blur-Effekt angewendet (b und c, jeweils horizontal und vertikal). In einem letzten Schritt wird das geblurrte Bild
+            mit dem originalen, ungeblurrtem Eingangsbild geblendet (d) um so die eigentliche Überstrahlung zu simulieren.
+        </p>
+<div align="center">    
+            <p>
+                <img src="/studies-blog-archiv/rtr/ue5/img/bloom_schema.jpg" alt="Bloom-Shader Schematische Darstellung" style="margin:auto;display:block;" width="50%" height="50%">
+                Abbildung 3: Rendering-Schritte des Bloom-Effekts.
+            </p>
+        </div> 
+           
+    <h4>Gaussian Blur Filter</h4>
+    <p>
+        Ein Blur Filter bezieht für die Farbwertberechnung des aktuell betrachteten Pixels, je nach Kernel, umliegende
+        Pixel bzw. deren Farbe mit heran und bildet aus ihnen den Mittelwert. Bei einem <a href="http://en.wikipedia.org/wiki/Gaussian_blur" target="_blank">Blur Filter über eine Gaussschen Glockenfunktion</a> werden die Farben je nach 
+        Abstand zu dem aktuell berechneten Pixel zusätzlich anders gewichtet, was schlussendlich zu einem glatten, verwaschenem Verlauf führt (siehe Abbildung 4). Im Gegensatz zu ungewichteten Implementierungen wie etwas einem <a href="http://en.wikipedia.org/wiki/Gaussian_blur" target="_blank">Box-Filter</a>
+        ist dies nicht trivial, sodass Box-Filter oft als Annäherung für Gauß-Filter dienen. Unabhängig davon lassen sich bei beiden Filtertypen die Berechnungen in die jeweilige
+        x- und y-Dimension unabhängig voneinander betrachten, was die Gesamtberechnung deutlich beschleunigt. Zunächst wird in
+        horizontaler Richtung geblurrt und danach in vertikaler. Dieser Sachverhalt wird in Abbildung 3 verdeutlicht. 
+    </p>
+<div align="center">    
+        <p>
+        </p>
+<table width="100%" height="100%" border="0" cellpadding="30" cellspacing="30">
+            <tr>
+                <td align="center" width="50%">
+<img src="/studies-blog-archiv/rtr/ue5/img/blur_h_v.jpg" style="margin:auto;display:block;" alt="Blur in horizontal und vertikaler Richtung." width="100%" height="100%" title="Blur in horizontal und vertikaler Richtung."> Abbildung 3: Schrittweises Blurring in horizontaler und vertikaler Richtung.</td>
+                <td align="center" width="50%">
+<img src="/studies-blog-archiv/rtr/ue5/img/gaussian.jpg" style="margin:auto;display:block;" alt="Gauß-Funktion" width="50%" height="50%" title="Gauß-Funktion">Abbildung 4: Gauß-Funktion als Kurve</td>
+            </tr>
+        </table>             
+        
+    </div> 
+    <p>
+        Ein weiterer interessanter Punkt ist auch, das die BlurMap nicht die selbe Auflösung haben muss, wie das Render-Fenster. Das bedeutet auch, das bei kleineren Auflösungen
+        der Kernel kleiner sein kann, was sich widerrum direkt positiv auf die Performance auswirkt. Und da die BlurMap in den meisten Fällen nicht sehr detailiert sein muss, bietet sich eine
+        kleine Auflösung an. Es kann sogar passieren, das bei zu hohen Auflösungen, der Bloom-Effekt fast nicht mehr zur Geltung kommt, da unter Umständen der Kernel einfach zu klein ist.
+        Als Workaround könnte man, um nicht die Kernelgröße stark erhöhen zu müssen, einen höheren <em>BlurScale</em> setzen. Das bedeutet das der Kernel gleich groß bleibt, jedoch
+        werden bei jeder Iteration X Pixel übersprungen. Dadurch wird ein größerer Kernel simuliert, jedoch leidet die Bildqualität darunter. Schlussendlich sollte immer probiert werden,
+        die Auflösung zu verringern, um diesen Problemen aus den Weg zu gehen. Die richtige Balance aus Auflösung und dem Blur-Ergebnis ist entscheidend.
+    </p> 
+    <p>
+        <em>BlurStrength:</em> Die Gauß-Formel resultiert in einem intensiveren Farbwert, je näher aktuell betrachtete Pixel am Ursprung ist. Also je näher x sich 0 annähert (siehe
+        Grauß-Formel im Wiki, x = positiver/negativer Abstand zum Ursprung). Wenn man nun das eingehende x mit einem Wert kleiner 1.0, reduziert das den Abfall im Blur-Verlauf und führt zu einem noch überbelichtetem 
+        Ergebnis.
+    </p> 
+    <h4>Blending</h4>
+    <p>
+        Als Blending Mode zwischen dem finalen, geblurrten Bild und dem orginalen Eingangsbild kommt einfaches Additives Blending zum Einsatz, wobei die jeweiligen Farbwerte
+        der entsprechenden Pixel der beiden Texturen einfach addiert werden. Dieser Blendmode ist sehr schnell und zeigt gute Ergebnisse.
+    </p>       
+    <h4>Implementierung</h4>
+    <p>
+        Der Bloom-Effekt lässt sich mit Hilfe von Multi-Pass-Rendering simulieren. Als Multi-Pass-Rendering bezeichnet man eine Technik,
+        bei der eine Szene nicht direkt in den Backbuffer gerendert wird, sondern zunächst in einen weiteren Speicher, unter OpenGL 
+        <a href="http://www.songho.ca/opengl/gl_fbo.html" target="_blank">Frame Buffer Objects (FBO)</a> genannt. Nun kann die Szene,
+        als Textur an das FBO gebunden, nocheinmal in einem zweiten <em>Render-Pass</em> verändert werden, beispielsweise indem diese Textur in einem Fragment-Shader
+        gesetzt wird (<em>render to texture</em>). Es sind beliebig vieler solcher <em>Passes</em> denkbar.
+    </p> 
+    <div class="row">
+        <div class="span6">
+            <p>
+                Zunächst werden drei FBO's und ein BackBuffer angelegt, indem am Ende das finale Bild gerendert wird. Das erste FBO <em>colorBuffer</em> beinhaltet das orginale,
+                unveränderte Bild, mit dem am Schluss geblendet wird. Das FBO <em>blurMap</em> ist zunächst leer und hält später das geblurrte Bild. Es gibt nur ein
+                FBO im dem das horizontale Blurring (<em>horizontalBlur</em>) ausgeführt wird, da das vertikale Blurring direkt in der <em>blurMap</em> stattfindet. Ist das Blurring beendet, wird der BackBuffer
+                gebunden, in welchem die <em>blurMap</em> mit dem <em>colorBuffer</em> geblendet wird.
+            </p>
+        </div>
+        <div class="span6">
+            <p>
+                <img src="/studies-blog-archiv/rtr/ue5/img/fbo_creation.png">
+            </p>
+        </div>         
+    </div>      
+    <div class="row">
+        <div class="span6">
+            <p>
+                Rendern der Szene in den <em>colorBuffer</em>.
+            </p>
+        </div>
+        <div class="span6">
+            <p>
+                <img src="/studies-blog-archiv/rtr/ue5/img/colorbuffer.png" width="80%" height="80%">
+            </p>
+        </div>         
+    </div>              
+    <div class="row">
+        <div class="span6">
+            <p>
+                Das erste, horizontale Blurring wird erstellt, indem ein Quadrat, in der Größe des Render-Fensters, mit einem entsprechendem Blur-Fragment-Program gerendert wird.
+                Als Eingangstextur wird hier die Textur des <em>colorMap</em> FBO übergeben. Der Viewport wird auf die entsprechende Auflösung der BlurMap gesetzt.               
+            </p>
+        </div>
+        <div class="span6">
+            <p>
+                <img src="/studies-blog-archiv/rtr/ue5/img/horizontal.png" width="60%" height="60%">
+            </p>
+        </div>         
+    </div>
+    <div class="row">
+        <div class="span6">
+            <p>
+                Das zweite, vertikale Blurring wird hinzugefügt, indem die bislang leere <em>blurMap</em> gebunden wird und in deren Textur wieder ein Quadrat mit einem Blur-Fragment-Program gerendert wird.
+                Als Eingangstextur wird aber diesmal die bereits horizontal geblurrte Textur des <em>horizontalBlur</em> FBO gegeben. Die <em>blurMap</em> ist damit in beide 
+                Richtungen geblurrt und liefert ein fertiges Ergebnis zum Blenden.
+            </p>
+        </div>
+        <div class="span6">
+            <p>
+                <img src="/studies-blog-archiv/rtr/ue5/img/mix.png" width="50%" height="50%">
+            </p>
+        </div>         
+    </div>
+    <div class="row">
+        <div class="span6">
+            <p>
+                Nun wird der BackBuffer gebunden indem erneut das Quadrat gerendert wird, jedoch diesmal mit einem Shader, der das Additive Blending vornimmt. Dieser Shader bekommt
+                erwartungsgemäß die orginale, unveränderte Textur des <em>colorBuffer</em> FBO's und die gerade geblurrte Texture des <em>blurMap</em> FBO übergeben. Wichtig ist hierbei
+                das Zurücksetzten des Viewports auf die entsprechende Fenstergröße.
+            </p>
+        </div>
+        <div class="span6">
+            <p>
+                <img src="/studies-blog-archiv/rtr/ue5/img/render_bloom.png" width="75%" height="75%">
+            </p>
+        </div>         
+    </div>           
+        
+        
+    <h2>Verwendete Ressourcen und Quellcode</h2>
+    <ul>
+        Ressourcen
+        <li>
+<a href="https://github.com/toji/gl-matrix" target="_blank">glMatrix Bibliothek</a>
+        </li>
+        <li>
+<a href="http://twitter.github.com/bootstrap/" target="_blank">Bootstrap CSS für das Layout</a>
+        </li>
+        <li>
+<a href="http://code.google.com/p/threedlibrary/" target="_blank">TDL, JavaScript OpenGL Bibliothek</a>
+        </li>
+        Tutorials/Weblinks
+        <li>
+<a href="http://www.gamasutra.com/view/feature/130520/realtime_glow.php" target="_blank">Real-Time Glow</a>
+        </li> 
+        <li>
+<a href="http://devmaster.net/posts/3100/shader-effects-glow-bloom" target="_blank">Shader Effects: Glow and Bloom</a>
+        </li>
+        <li>
+<a href="http://dev.opera.com/articles/view/webgl-post-processing/" target="_blank">Multiple Post-Processing Passes</a>
+        </li>
+        <li>
+<a href="http://media2mult.uos.de/pmwiki/fields/cgp12/index.php?n=BST.Bloomeffekt" target="_blank">Bloomeffekt</a>
+        </li>
+        <li>
+<a href="http://en.wikipedia.org/wiki/Bloom_(shader_effect)" target="_blank">Bloom (shader effect)</a>
+        </li>            
+        <li>
+<a href="http://www.jhlabs.com/ip/blurring.html" target="_blank">Blurring for Beginners</a>
+        </li>
+        Quellcode           
+        <li>
+<a href="/studies-blog-archiv/rtr/ue5/ue5.rar" target="_blank">Quellcode Ü5</a>
+        </li>       
+    </ul>
+</div>
+</body>
+
+
+<!-- Default shader. Just colored checkers. -->
+
+<script id="vs0" type="text/glsl">uniform mat4 projection;
+uniform mat4 view;
+uniform mat4 model;
+
+attribute vec4 position;
+attribute vec4 normal;
+attribute vec2 texCoord;
+
+varying vec2 texCoordI;
+
+varying vec4 iPosition;
+uniform float time;
+uniform bool rippled;
+
+float pi2 = asin(1.0);
+
+float wave(float x, float t, float A, float f, float c, float p0) {
+    return A * sin(pi2 * f * (t - x/c) + p0);
+    }
+
+void main() {  
+  if(!rippled)
+  {
+        texCoordI = texCoord;
+        gl_Position = projection * view * model * position;
+  }
+  else
+  {
+  
+        vec3 direction = vec3(0.0, 0.0, 0.0);
+        float projected = dot(direction, position.xyz);
+        vec3 dispdir = position.xyz - direction * projected;
+        float displacement = wave(projected, time, 0.2, 1.0, -0.1, 0.0);
+
+        vec3 rippled = position.xyz + dispdir * displacement;
+        iPosition = vec4(rippled, 1.0);
+        gl_Position = projection * view * model * iPosition;
+  }
+}</script>
+
+<script id="fs0" type="text/glsl">precision highp float;
+
+varying vec2 texCoordI;
+uniform vec3 color;
+
+void main() {
+  //vec2 tc = floor(texCoordI * 8.0);
+  //gl_FragColor.rg = texCoordI;
+  //gl_FragColor.b = mod(tc.x + tc.y, 2.0) == 0.0 ? 0.0 : 1.0;  
+  gl_FragColor.rgb = color;
+  gl_FragColor.a = 1.0;
+}</script>
+
+<script id="vsScreenQuad" type="text/glsl">attribute vec4 position;
+varying vec2 texCoordI;
+
+void main() {
+	texCoordI = (position.xy + 1.0) / 2.0;
+	gl_Position = position;
+}</script>
+
+<script id="blur" type="text/glsl">
+precision highp float;
+
+uniform float TexelSizeW;
+uniform float TexelSizeH;
+uniform sampler2D frame;
+
+uniform int Orientation;
+uniform int BlurAmount;
+uniform float BlurScale;
+uniform float BlurStrength;
+
+varying vec2 texCoordI;
+
+float Gaussian (float x, float deviation)
+{
+	return (1.0 / sqrt(2.0 * 3.141592 * deviation)) * exp(-((x * x) / (2.0 * deviation)));	
+}
+
+void main (){
+	
+	float halfBlur = float(BlurAmount) * 0.5;
+	vec4 colour = vec4(0.0);
+	vec4 texColour = vec4(0.0);
+	
+	// gaussian deviation
+	float deviation = halfBlur * 0.35;
+	deviation *= deviation;
+	float strength = 1.0 - BlurStrength;
+	
+	if ( Orientation == 0 )
+	{
+		// horizontal blur
+		for (int i = 0; i < 10; ++i)
+		{
+			if ( i >= BlurAmount )
+				break;
+			
+			float offset = float(i) - halfBlur;
+                        vec2 tc = texCoordI + vec2(offset * TexelSizeW * BlurScale, 0.0); 
+			texColour = texture2D(frame, tc) * Gaussian(offset * strength, deviation);
+			colour += texColour;                    
+		}
+	}
+	else
+	{
+		// vertical blur
+		for (int i = 0; i < 10; ++i)
+		{
+			if ( i >= BlurAmount )
+				break;
+			
+			float offset = float(i) - halfBlur;
+                        vec2 tc = texCoordI + vec2(0.0, offset * TexelSizeH * BlurScale);
+			texColour = texture2D(frame, tc) * Gaussian(offset * strength, deviation);
+			colour += texColour;
+		}
+	}      
+    
+	
+	// Apply colour
+	gl_FragColor = clamp(colour, 0.0, 1.0);
+	gl_FragColor.a = 1.0;
+}
+</script>
+
+<script id="blend" type="text/glsl">precision highp float;
+
+uniform sampler2D colormap;
+uniform sampler2D blurmap;
+uniform bool renderColorMap;
+uniform bool renderBlurMap;
+
+varying vec2 texCoordI;
+
+void main ()
+{
+	vec4 dst = texture2D(colormap, texCoordI); // rendered scene
+	vec4 src = texture2D(blurmap, texCoordI); // blurmap
+        
+        if(renderColorMap)
+            gl_FragColor = dst;
+        else if(renderBlurMap)
+            gl_FragColor = src;
+        else
+        {
+            // additive blending 
+            gl_FragColor = min(src + dst, 1.0);
+        }
+}</script>
+
+</html>

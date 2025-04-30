@@ -1,0 +1,208 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>Lösung zur Ü4: Environment Mapping</title>
+      
+        <script src="/studies-blog-archiv/rtr/tdl/base.js"></script>
+        <script src="/studies-blog-archiv/rtr/tdl/gl-matrix.js"></script>
+        <script src="/studies-blog-archiv/rtr/common/jquery-1.7.1.min.js"></script>
+      
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="/studies-blog-archiv/rtr/common/bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="/studies-blog-archiv/rtr/common/bootstrap/css/bootstrap-responsive.min.css">
+      
+        <style type="text/css">body {
+                padding-top: 60px;
+                padding-bottom: 40px;
+            }</style>
+      
+        <style type="text/css">#error { display: none; }
+            #canvas { border: 1px solid black; }</style>
+      
+        <script type="text/javascript" src="/studies-blog-archiv/rtr/ue4/entity.js"></script>
+        <script type="text/javascript" src="/studies-blog-archiv/rtr/ue4/index.js"></script>
+    </head>
+    
+    <body>
+    <header class="navbar navbar-fixed-top">
+        <div class="navbar-inner">
+            <div class="container">
+                <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </a> <a class="brand" href="/studies-blog-archiv/2012/04/23/losungen-vl-real-time-rendering/">Aufgaben-Übersicht RTR</a>
+                <div class="nav-collapse">
+                    <ul class="nav">
+                        <li class="active"><a href="/studies-blog-archiv/rtr/ue4/index.html">Aufgabe 4: Environment Mapping</a></li> 
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="container">
+        <div class="page-header">
+            <h1>Aufgabe 4.4: Spährisches Reflection-Mapping</h1>
+        </div>
+
+        <pre id="error" class="alert alert-error"></pre>
+        
+        <h2>Aufgabenstellung</h2>          
+        <div class="banner"><p>
+                <img src="/studies-blog-archiv/rtr/ue4/img/escher.jpg"><img src="/studies-blog-archiv/rtr/ue4/img/posx.png"><img src="/studies-blog-archiv/rtr/ue4/img/posy.png"><img src="/studies-blog-archiv/rtr/ue4/img/posz.png"><img src="/studies-blog-archiv/rtr/ue4/img/negx.png"><img src="/studies-blog-archiv/rtr/ue4/img/negy.png"><img src="/studies-blog-archiv/rtr/ue4/img/negz.png">
+            </p></div>
+        <p>Entwickeln sie Vertex- und Fragement-Shader für sphärisches Reflection-Mapping.</p>   
+            
+        <div id="canvas-container">
+            <p><canvas id="canvas" width="800" height="600"></canvas></p>
+        </div>
+
+        <legend>Controls</legend>
+        <ul>
+            <li>"1": Ausgangs-Shader (eingefärbtes Schachbrettmuster)</li>
+            <li>"2": Normales Texture-Mapping</li>
+            <li>"3": Spährisches Reflection-Mapping</li>  
+            <p></p>
+            <li>"5": Texturwechsel (CGA-Labor)</li>
+            <li>"6": Texturwechsel (M.C. Escher's Selbstportrait)</li>    
+        </ul>
+            
+        <h2>Erläuterungen zur Übung</h2>
+        <div class="row">
+            <div class="span6">
+                <p>
+                   Im Vertex-Shader wird eine Abbildung von den Vertexnormalen auf die Texturkoordinaten vorgenommen,
+                   um den Teil der Textur, der die Kugel anzeigt, auf die dreidimensionale Kugeloberfläche zu projizieren. (Zeile 215-216)
+                </p>
+                <p>
+                   Aufgrund der ausschließlichen Betrachtung von Vertexnormalen im Kameraraum, passt sich die Projektion der Textur nicht an
+                   den Betrachtungswinkel des Kugelmodells an, da die Normalen in Kamerakoordinaten aus jedem Blickwinkel gleich sind.
+                </p>
+                <p>
+                   Weiterhin wird eine orthographische Projektion durch Festlegen einer konstanten Kameraposition erreicht. Es muss auch beachtet
+                   werden, dass die Kamera einen ausreichenden Abstand zur Kugel hat, da in dem simulierten Model der Betrachter
+                   unendlich weit entfernt ist (orthogonale Projektion vorausgesetzt).
+                </p>
+            </div>
+            <div class="span6">
+                <img src="/studies-blog-archiv/rtr/ue4/img/fs_vs_shaders_spaehrisches_reflection_mapping.png" alt="Sourcecode Spährisches Reflection-Mapping">
+            </div>
+        </div>      
+            
+        <h2>Verwendete Ressourcen und Quellcode</h2>
+        <ul>
+            Ressourcen
+            <li>
+<a href="https://github.com/toji/gl-matrix" target="_blank">glMatrix Bibliothek</a>
+            </li>
+            <li>
+<a href="http://twitter.github.com/bootstrap/" target="_blank">Bootstrap CSS für das Layout</a>
+            </li>
+            <li>
+<a href="http://code.google.com/p/threedlibrary/" target="_blank">TDL, JavaScript OpenGL Bibliothek</a>
+            </li>
+            Tutorials/Weblinks
+            <li>
+<a href="http://www.springer-vieweg.de/freebook/978-3-8348-0186-9_l.pdf" target="_blank">Umgebungs-Texturen (Environment Maps) / Sphärische Texturierung (Sphere Mapping)</a>
+            </li> 
+             <li>
+<a href="http://wwwvis.informatik.uni-stuttgart.de/plain/vdl/vdl_upload/97_3_BS-02-bw.pdf" target="_blank">Sphere Mapping</a>
+            </li>
+             <li>
+<a href="http://www.mvps.org/directx/articles/spheremap.htm" target="_blank">Spherical Mapping with Normals</a>
+            </li>
+            Quellcode           
+            <li>
+<a href="/studies-blog-archiv/rtr/ue4/ue4.4.rar" target="_blank">Quellcode Ü4.4</a>
+            </li>
+                
+        </ul>
+    </div>
+</body>
+
+<!-- Default shader. Just colored checkers. -->
+
+<script id="vs0" type="text/glsl">uniform mat4 projection;
+uniform mat4 view;
+uniform mat4 model;
+
+attribute vec4 position;
+attribute vec4 normal;
+attribute vec2 texCoord;
+
+varying vec2 texCoordI;
+
+void main() {  
+  texCoordI = texCoord;
+  gl_Position = projection * view * model * position;
+}</script>
+
+<script id="fs0" type="text/glsl">precision highp float;
+
+varying vec2 texCoordI;
+
+void main() {
+  vec2 tc = floor(texCoordI * 8.0);
+  gl_FragColor.rg = texCoordI;
+  gl_FragColor.b = mod(tc.x + tc.y, 2.0) == 0.0 ? 0.0 : 1.0;  
+}</script>
+
+<!-- default texture mapping -->
+
+<script id="vs1" type="text/glsl">uniform mat4 projection;
+uniform mat4 view;
+uniform mat4 model;
+
+attribute vec4 position;
+attribute vec4 normal;
+attribute vec2 texCoord;
+
+varying vec2 texCoordI;
+
+void main() {  
+  texCoordI = texCoord;
+  gl_Position = projection * view * model * position;
+}</script>
+
+<script id="fs1" type="text/glsl">precision highp float;
+
+varying vec2 texCoordI;
+uniform sampler2D envMap;
+
+void main() { 
+  gl_FragColor.rgb = texture2D(envMap, texCoordI).rgb;
+  gl_FragColor.a = 1.0;
+}</script>
+
+<!-- spherical reflection mapping shaders -->
+
+<script id="vs2" type="text/glsl">uniform mat4 projection;
+uniform mat4 view;
+uniform mat4 model;
+
+attribute vec4 position;
+attribute vec4 normal;
+attribute vec2 texCoord;
+
+varying vec2 texCoordI;
+
+//float PI = 3.14159265358979323846264;
+
+void main() {  
+  vec4 normalC = normalize(view * model * vec4(normal.xyz, 0.0));  
+  vec2 texCoord = vec2(normalC.x / 2.0 + 0.5, normalC.y  / 2.0 + 0.5);
+  // flip texture y coordinate 
+  texCoord.y = 1.0 - texCoord.y;
+  texCoordI = texCoord;
+  
+  gl_Position = projection * view * model * position;
+}</script>
+
+<script id="fs2" type="text/glsl">precision highp float;
+
+varying vec2 texCoordI;
+uniform sampler2D envMap;
+
+void main() { 
+  gl_FragColor.rgb = texture2D(envMap, texCoordI).rgb;
+  gl_FragColor.a = 1.0;
+}</script>
+
+</html>

@@ -1,0 +1,369 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Lösung zur Ü3: Simple Lighting</title>
+  <script type="text/javascript" src="/studies-blog-archiv/rtr/tdl/base.js"></script>
+  <script type="text/javascript" src="/studies-blog-archiv/rtr/tdl/gl-matrix.js"></script>
+
+  <script src="/studies-blog-archiv/rtr/common/jquery-1.7.1.min.js"></script>
+   <link href="/studies-blog-archiv/rtr/common/bootstrap/css/bootstrap.css" rel="stylesheet">
+        <style type="text/css">body {
+                padding-top: 60px;
+                padding-bottom: 40px;
+            }</style>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="/studies-blog-archiv/rtr/common/bootstrap/bootstrap.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="/studies-blog-archiv/rtr/common/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="/studies-blog-archiv/rtr/common/bootstrap/css/bootstrap-responsive.min.css">
+
+  <style type="text/css">#error { display: none; }
+    #canvas { border: 1px solid black; }</style>
+
+  <script type="text/javascript" src="/studies-blog-archiv/rtr/ue3/3.2.js"></script>
+</head>
+
+<body>
+    
+    <header class="navbar navbar-fixed-top">
+        <div class="navbar-inner">
+            <div class="container">
+                <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </a> <a class="brand" href="/studies-blog-archiv/2012/04/23/losungen-vl-real-time-rendering/">Lösungen zur Ü3: Simple Lighting</a>
+                <div class="nav-collapse">
+                    <ul class="nav">
+                        <li><a href="/studies-blog-archiv/rtr/ue3/3.1.html">Aufgabe 3.1</a></li>
+                        <li class="active"><a href="/studies-blog-archiv/rtr/ue3/3.2.html">Aufgabe 3.2</a></li>
+                        <li><a href="/studies-blog-archiv/rtr/ue3/3.3.html">Aufgabe 3.3</a></li>                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+  <div class="container">
+    <div class="page-header">
+      <h1>Aufgabe 3.2</h1>
+    </div>
+  
+    <pre id="error" class="alert alert-error"></pre>
+    
+    <h2>Aufgabenstellung</h2>   
+        <p>Modifizieren sie den Toon-Shader aus <a href="/studies-blog-archiv/rtr/ue3/3.1.html">Aufgabe 3.1</a> so, dass die Szene von unabhägigen und verschiedenfarbigen
+            Lichtquellen an unterschiedlichen Positionen beleuchtet wird. Intensität und Position der Lichtquellen
+            soll von der Anwendung aus über <code>uniform</code> Variablen steuerbar sein. Wählen sie Geometrie und Farben so,
+            dass der Effekt gut zur Geltung kommt.</p>   
+  
+    <div id="canvas-container">
+      <p><canvas id="canvas" width="800" height="600"></canvas></p>
+    <!-- well --> 
+            <form class="form-horizontal">
+                <fieldset>
+                    <legend>Einstellungen</legend>
+                    <div class="row">
+                        <div class="span6">
+                            Licht 1
+                            <div class="control-group">                                 
+                                <label for="color0" class="control-label">Farbe</label>
+                                <div class="controls">
+                                    <input type="text" id="color0" class="form-inline" value="0.65; 0; 0">
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label for="position0" class="control-label">Position</label>
+                                <div class="controls">
+                                    <input type="text" id="position0" class="form-inline" value="10; 10; 10">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="span6">
+                            Licht 2
+                            <div class="control-group">
+                                <label for="color1" class="control-label">Farbe</label>
+                                <div class="controls">
+                                    <input type="text" id="color1" class="form-inline" value="0; 0; 0.65">
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label for="position1" class="control-label">Position</label>
+                                <div class="controls">
+                                    <input type="text" id="position1" class="form-inline" value="10; 10; -10">
+                                </div>
+                            </div>
+                        </div>
+                         <div class="span6">
+                            Licht 3
+                            <div class="control-group">
+                                <label for="color2" class="control-label">Farbe</label>
+                                <div class="controls">
+                                    <input type="text" id="color2" class="form-inline" value="0; 0.65; 0">
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label for="position2" class="control-label">Position</label>
+                                <div class="controls">
+                                    <input type="text" id="position2" class="form-inline" value="-10; 10; 10">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+    </div>  
+  
+    <legend>Controls</legend>
+        <ul>
+            <li>"s": Startet/Stopt die Animation</li>
+            <li>"p": Phong-Shader</li>
+            <li>"t": Toon-Shader</li>           
+        </ul>
+        
+        <h2>Erläuterungen zur Übung</h2>
+        <div class="row">
+            <div class="span6">
+                <p>
+                    Der vorhandene Shader-Code wurde nahezu vollständig übernommen und lediglich erweitert.
+                </p>
+                <p>
+                    So berechnet der Vertex-Shader statt für eine Lichtquelle die Richtung dieser nun für drei. Dabei werden
+                    die Positionsangaben wie gehabt über Uniform-Variablen an den Shader übergeben.
+                </p>
+                 <p>
+                     Im Fragment-Shader beachtet die <em>toon()</em>-Funktion zusätzlich die Lichtintensität für die diskretisierten,
+                     diffusen Farbabstufungen (u.A. Zeile 214). Die Outline bleibt weiterhin schwarz und auch das Glanzlicht wird nicht mit der Lichtfarbe
+                     verrechnet. Der wichtigste Unterschied im Fragment-Shader ist, das für jedes Fragment die <em>toon()</em>-Funktion
+                     in Abhängigkeit der Licht-Anzahl ausgeführt wird (Zeile 232-245). Dabei werden die jeweiligen Licht-Parameter übergeben
+                     und die einzelnen Ergebnisse aufsummiert, so das ein mischen der Lichtfarbe erreicht wird, 
+                     sofern das Fragment von mehreren Lichtquellen getroffen wird.
+                </p>
+            </div>
+            <div class="span6">
+                <img src="/studies-blog-archiv/rtr/ue3/src_toon_shader_a2.png" alt="Sourcecode Toon-Shader">
+            </div>
+        </div>      
+        
+        <h2>Verwendete Ressourcen und Quellcode</h2>
+        <ul>
+            Ressourcen
+            <li>
+<a href="https://github.com/toji/gl-matrix" target="_blank">glMatrix Bibliothek</a>
+            </li>
+            <li>
+<a href="http://twitter.github.com/bootstrap/" target="_blank">Bootstrap CSS für das Layout</a>
+            </li>
+            <li>
+<a href="http://code.google.com/p/threedlibrary/" target="_blank">TDL, JavaScript OpenGL Bibliothek</a>
+            </li>
+            Quellcode                    
+             <li>
+<a href="/studies-blog-archiv/rtr/ue3/ue2.rar" target="_blank">Quellcode Ü3 A2</a>
+            </li>
+                        
+        </ul>
+    </div>
+</body>
+
+<!-- Toon Shader, Multiple lights -->
+
+<script id="vs0" type="text/glsl">//struct Light
+//{
+//    vec3 Position;    
+//    vec3 Direction;
+//    vec3 Colour;  
+//};
+//#define NUM_LIGHTS 2
+//uniform vec3 lightPositions[3];
+//uniform Light lights[NUM_LIGHTS];
+//varying vec3 lightDir[NUM_LIGHTS];
+// glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
+
+uniform mat4 projection;
+uniform mat4 view;
+uniform mat4 model;
+
+uniform vec3 lightPosition0;
+uniform vec3 lightPosition1;
+uniform vec3 lightPosition2;
+uniform vec3 eyePosition;
+
+attribute vec4 position;
+attribute vec3 normal;
+
+varying vec3 normalW;
+varying vec3 lightDirectionW0;
+varying vec3 lightDirectionW1;
+varying vec3 lightDirectionW2;
+varying vec3 eyeDirectionW;
+
+void main() {
+  vec4 positionW = model * position;
+  normalW = (model * vec4(normal, 0.0)).xyz;
+  lightDirectionW0 = lightPosition0 - positionW.xyz;
+  lightDirectionW1 = lightPosition1 - positionW.xyz;
+  lightDirectionW2 = lightPosition2 - positionW.xyz;
+  eyeDirectionW = eyePosition - positionW.xyz;
+ 
+  gl_Position = projection * view * positionW;
+}</script>
+
+<script id="fs0" type="text/glsl">
+precision highp float;
+
+uniform vec3 color;
+uniform vec3 lightIntensity0;
+uniform vec3 lightIntensity1;
+uniform vec3 lightIntensity2;
+
+uniform vec3 lightSpec0;
+uniform vec3 lightSpec1;
+uniform vec3 lightSpec2;
+
+varying vec3 normalW;
+varying vec3 lightDirectionW0;
+varying vec3 lightDirectionW1;
+varying vec3 lightDirectionW2;
+varying vec3 eyeDirectionW;
+            
+vec3 toon(vec3 normal, vec3 eye, vec3 light, vec3 intensity, vec3 color) {  
+
+     // outline (simple silhouette)? 
+    if(max(dot(eye, normal), 0.0) < 0.3)
+    {
+        color = vec3(0,0,0);
+    } 
+    else
+    {            
+        // diffuse
+        float diffuse = max(dot(normal,light),0.0);       
+        if (diffuse < 0.2)
+            color *=0.2 * intensity;
+        else if (diffuse < 0.4)
+            color *=0.4 * intensity;
+        else if (diffuse < 0.6)
+            color *=0.6 * intensity;
+        else if(diffuse < 0.8)
+            color *=0.8 * intensity;
+        else if(diffuse < 1.0)
+            color *=1.0 * intensity;
+            
+        // spec (highest prio)
+        vec3 reflection = normalize(reflect(-eye, normal));
+        float spec = pow(max(0.0, dot(reflection, light)), 10.0); 
+        // more than half highlight intensity? 
+        if (spec > 0.5) 
+            color = vec3(1, 1, 1);
+   }   
+
+   //return color * intensity;
+   return color;
+    
+}
+
+void main() {
+  vec3 finalColor = vec3(0, 0, 0);
+ finalColor += toon(
+    normalize(normalW), 
+    normalize(eyeDirectionW), 
+    normalize(lightDirectionW0), lightIntensity0, color);
+  finalColor += toon(
+    normalize(normalW), 
+    normalize(eyeDirectionW), 
+    normalize(lightDirectionW1), lightIntensity1, color);
+  finalColor += toon(
+    normalize(normalW), 
+    normalize(eyeDirectionW), 
+    normalize(lightDirectionW2), lightIntensity2, color);
+  gl_FragColor.rgb = finalColor;
+  gl_FragColor.a = 1.0;
+}
+</script>
+
+<!-- Phong lighting model, Phong shading -->
+
+<script id="vs1" type="text/glsl">uniform mat4 projection;
+uniform mat4 view;
+uniform mat4 model;
+
+uniform vec3 lightPosition0;
+uniform vec3 lightPosition1;
+uniform vec3 lightPosition2;
+uniform vec3 eyePosition;
+
+attribute vec4 position;
+attribute vec3 normal;
+
+varying vec3 normalW;
+varying vec3 lightDirectionW0;
+varying vec3 lightDirectionW1;
+varying vec3 lightDirectionW2;
+varying vec3 eyeDirectionW;
+
+void main() {
+  vec4 positionW = model * position;
+  normalW = (model * vec4(normal, 0.0)).xyz;
+  lightDirectionW0 = lightPosition0 - positionW.xyz;
+  lightDirectionW1 = lightPosition1 - positionW.xyz;
+  lightDirectionW2 = lightPosition2 - positionW.xyz;
+  eyeDirectionW = eyePosition - positionW.xyz;
+
+  gl_Position = projection * view * positionW;
+}</script>
+
+<script id="fs1" type="text/glsl">precision highp float;
+
+uniform vec3 color;
+uniform vec3 lightIntensity0;
+uniform vec3 lightIntensity1;
+uniform vec3 lightIntensity2;
+
+uniform vec3 lightSpec0;
+uniform vec3 lightSpec1;
+uniform vec3 lightSpec2;
+
+varying vec3 normalW;
+varying vec3 lightDirectionW0;
+varying vec3 lightDirectionW1;
+varying vec3 lightDirectionW2;
+varying vec3 eyeDirectionW;
+
+vec3 lambert(vec3 normal, vec3 light, 
+             vec3 lightIntensity, vec3 color) {
+   
+  float lambertTerm = max(0.0, dot(normal, light));
+             
+  return 0.1 * color * lightIntensity + // lightdiffuse
+         0.6 * color * lightIntensity * // material diffuse
+         lambertTerm; 
+}
+
+vec3 phong(vec3 normal, vec3 eye, vec3 light, 
+           vec3 lightIntensity, vec3 color) {
+           
+  vec3 vLambert = lambert(normal, light, lightIntensity, color);
+  vec3 R = reflect(-light, normal);
+  float specular = pow(max(dot(R, eye), 0.0), 10.0);
+  return vLambert +
+        0.3 * // material spec
+        lightIntensity * // light spec
+        specular;
+}
+
+void main() {
+  vec3 finalColor = vec3(0.25, 0.25, 0.25);
+ finalColor += phong(
+    normalize(normalW), 
+    normalize(eyeDirectionW), 
+    normalize(lightDirectionW0), lightIntensity0, color);
+  finalColor += phong(
+    normalize(normalW), 
+    normalize(eyeDirectionW), 
+    normalize(lightDirectionW1), lightIntensity1, color);
+  finalColor += phong(
+    normalize(normalW), 
+    normalize(eyeDirectionW), 
+    normalize(lightDirectionW2), lightIntensity2, color);
+  gl_FragColor.rgb = finalColor;
+  gl_FragColor.a = 1.0;  
+}</script>
+
+</html>
