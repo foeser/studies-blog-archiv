@@ -1,0 +1,277 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>Lösung zur Ü3: Simple Lighting</title>
+        <script type="text/javascript" src="/rtr/tdl/base.js"></script>
+        <script type="text/javascript" src="/rtr/tdl/gl-matrix.js"></script>
+      
+        <script src="/rtr/common/jquery-1.7.1.min.js"></script>
+        <link href="/rtr/common/bootstrap/css/bootstrap.css" rel="stylesheet">
+        <style type="text/css">body {
+                padding-top: 60px;
+                padding-bottom: 40px;
+            }</style>
+            
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="/rtr/common/bootstrap/bootstrap.js" type="text/javascript"></script>
+        <link rel="stylesheet" type="text/css" href="/rtr/common/bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="/rtr/common/bootstrap/css/bootstrap-responsive.min.css">
+      
+        <style type="text/css">#error { display: none; }
+            #canvas { border: 1px solid black; }</style>
+      
+        <script type="text/javascript" src="/rtr/ue3/3.3.js"></script>
+    </head>
+    
+    <body>
+
+    <header class="navbar navbar-fixed-top">
+        <div class="navbar-inner">
+            <div class="container">
+                <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </a> <a class="brand" href="/2012/04/23/losungen-vl-real-time-rendering/">Lösungen zur Ü3: Simple Lighting</a>
+                <div class="nav-collapse">
+                    <ul class="nav">
+                        <li><a href="/rtr/ue3/3.1.html">Aufgabe 3.1</a></li>
+                        <li><a href="/rtr/ue3/3.2.html">Aufgabe 3.2</a></li>
+                        <li class="active"><a href="/rtr/ue3/3.3.html">Aufgabe 3.3</a></li>                       
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+        
+    <div class="container">
+        <div class="page-header">
+            <h1>Aufgabe 3.3</h1>
+        </div>
+        
+        <pre id="error" class="alert alert-error"></pre>
+        
+        <h2>Aufgabenstellung</h2>   
+        <p>Modifizieren sie Ihren Toon-Shader so, dass die Oberfläche nicht einfarbig erscheint, sondern mit gleichmäßig verteilten andersfarbigen
+            Punkten übersät ist. Farbe, Dichte und Radius der Punkte sollen über drei Uniform-Variablen von geeignetem Typ aus der
+        Anwendung heraus über die Tastatur steuerbar sein.</p> 
+        <div align="center"><p><img src="/rtr/ue3/dotted.png" alt="Phong- und Toon-Shading" width="50%" height="50%"></p></div>
+        <p>Zur Implementierung benötigen sie Zugriff auf die Texturkoordinaten für jedes Fragment.
+            Dazu müssen diese im Vertex-Programm per <code>attribute</code> Variable von der Anwendung entgegen genommen
+            und mit einer <code>varying</code> Variable an das Fragment-Programm übergeben werden.</p>
+              
+        <div id="canvas-container">
+            <p><canvas id="canvas" width="800" height="600"></canvas></p>    
+            <!-- well --> 
+            <form class="form-horizontal">
+                <fieldset>
+                    <legend>Einstellungen</legend>
+                    <div class="row">
+                        <div class="span6">
+                            <div class="control-group">
+                                <label for="color" class="control-label">Kreisfarbe</label>
+                                <div class="controls">
+                                    <input type="text" id="color" class="form-inline" value="1; 0; 0">
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label for="bgcolor" class="control-label">Hintergrundfarbe</label>
+                                <div class="controls">
+                                    <input type="text" id="bgcolor" class="form-inline" value="0; 0; 1">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="span6">
+                            <div class="control-group">
+                                <label for="radius" class="control-label">Radius</label>
+                                <div class="controls">
+                                    <input type="text" id="radius" class="form-inline" value="0.3">
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label for="density" class="control-label">Dichte</label>
+                                <div class="controls">
+                                    <input type="text" id="density" class="form-inline" value="5">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+        </div>  
+        
+        <legend>Controls</legend>
+        <ul>
+            <li>"s": Startet/Stopt die Animation</li>               
+        </ul>
+            
+        <h2>Erläuterungen zur Übung</h2>
+        <div class="row">
+            <div class="span6">
+                <p>
+                   Neben den Änderungen am Vertex-Shader, welche schon in der Aufgabenstellung beschrieben wurden, wurde der Fragment-Shader
+                   dahingehend verändert, das die bis dahin konstante Farbe durch eine Funktion ausgetauscht wurde. Die Fragmentfarbe
+                   wird also im Shader selbst bestimmt und nicht mehr von der Anwendung. Die Funktion bestimmt anhand der
+                   Texturkoordinate, welche Farbe für das aktuelle Fragment verwendet werden soll.                   
+                </p>                 
+                <p>
+                   Um das zu bestimmen wird zunächst ermittelt, ob ein Fragment innerhalb oder außerhalb eines zu zeichnenden Punktes (eines Kreises) liegt.
+                   Dies geschieht über die <a href="http://matheraum.de/wissen/AbstandsberechnungenR3">Abstandberechnung Punkt-Kugel (Abstand zum Mittelpunkt)</a>.
+                   Wenn also ein Punkt <em>p</em> und ein Kreismittelpunkt <em>m</em> gegeben sind, gilt für die Distanz <em>d=|m-p|</em>.
+                   Ist <em>d > r</em>, wobei <em>r</em> als Kreisradius definiert ist, befindet sich der Punkt respektive
+                   das Fragment außerhalb des Kreises und es wird auf die definierte Hintergrundfarbe gesetzt. Andernfalls befindet sich
+                   das Fragment innerhalb des Kreises und wird auf die definierte Kreisfarbe gesetzt (Zeile 273-277). 
+                </p>
+                <p>
+                   GLSL bietet für Distanz-Berechnungen die <em>distance()</em>-Funktion an.
+                </p>
+                <p>
+                    Weiterhin bestimmt die von Aussen definierte Dichte <em>D</em> die Anzahl der zu zeichnenden Kreise auf der Oberfläche,
+                    wobei das Texturkoordinatensystem abhängig von <em>D</em> unterteilt wird. Dabei ist das Koordinatensystem definiert
+                    mit Höhe und Breite von <em>x=y=1</em>. Dieses wird nun in kleinere Quadrate mit der Breite <em>x1=x/D</em> und der
+                    Höhe <em>y1=y/D</em> zerlegt (Zeile 266). Nun wird der lokale Radius eines Kreises in einem Quadranten mit <em>lr = r/D</em>
+                    berechnet, wobei <em>r</em> von Aussen definiert wurde (Zeile 265). Um den lokalen Kreismittelpunkt <em>lm</em> zu bestimmen, welcher
+                    mit <em>p</em> in einem Quadranten liegt, wird folgende Rechenvorschrift angewandt: <em>lm=int(p/x1_y1) * x1_y1 + m/D</em> (Zeile 268-271).
+                    Nun kann anhand der Distanz <em>d=|lm-p|</em> und dem berechneten, lokalen Radius <em>lr</em>, wie zuvor erwähnt, geprüft
+                    werden, ob ein Punkt sich im oder außerhalb des Kreises befindet und das Fragment entsprechend eingefärbt werden.
+                    
+                </p>
+                 <p>
+                    Für ein besseres, optisches Ergebnis wurde weiterhin die Berechnung der Outline/Silhouette entfernt.                   
+                </p>
+            </div>
+            <div class="span6">
+                <img src="/rtr/ue3/src_toon_shader_a3.png" alt="Sourcecode Toon-Shader">
+            </div>
+        </div>      
+            
+        <h2>Verwendete Ressourcen und Quellcode</h2>
+        <ul>
+            <li>
+<a href="https://github.com/toji/gl-matrix" target="_blank">glMatrix Bibliothek</a>
+            </li>
+            <li>
+<a href="http://twitter.github.com/bootstrap/" target="_blank">Bootstrap CSS für das Layout</a>
+            </li>
+            <li>
+<a href="http://code.google.com/p/threedlibrary/" target="_blank">TDL, JavaScript OpenGL Bibliothek</a>
+            </li>
+            Tutorials/Weblinks
+             <li>
+<a href="http://matheraum.de/wissen/AbstandsberechnungenR3" target="_blank">Abstandberechnung Punkt-Kugel (Abstand zum Mittelpunkt)</a>
+             </li>
+            Quellcode                     
+            <li>
+<a href="/rtr/ue3/ue3.rar" target="_blank">Quellcode Ü3 A3</a>
+            </li>
+                
+        </ul>
+    </div>
+</body>
+
+<!-- Toon Shader -->
+
+<script id="vs0" type="text/glsl">uniform mat4 projection;
+uniform mat4 view;
+uniform mat4 model;
+
+uniform vec3 lightPosition;
+uniform vec3 eyePosition;
+
+attribute vec4 position;
+attribute vec3 normal;
+
+varying vec3 normalW;
+varying vec3 lightDirectionW;
+varying vec3 eyeDirectionW;
+
+attribute vec2 texCoord;
+varying vec2 texCoordI;
+
+void main() {
+  vec4 positionW = model * position;
+  normalW = (model * vec4(normal, 0.0)).xyz;
+  lightDirectionW = lightPosition - positionW.xyz;  
+  eyeDirectionW = eyePosition - positionW.xyz;
+ 
+  gl_Position = projection * view * positionW;
+  
+  texCoordI = texCoord;
+}</script>
+
+<script id="fs0" type="text/glsl">
+precision highp float;
+
+uniform vec3 color;
+uniform vec3 lightIntensity;
+
+uniform vec3 background;
+uniform float radius;
+uniform float density;
+varying vec2 texCoordI;
+
+varying vec3 normalW;
+varying vec3 lightDirectionW;
+varying vec3 eyeDirectionW;
+            
+vec3 toon(vec3 normal, vec3 eye, vec3 light, vec3 intensity, vec3 color) {
+
+     // outline (simple silhouette)? 
+    //if(max(dot(eye, normal), 0.0) < 0.3)
+    //{
+    //    color = vec3(0,0,0);
+    //} 
+    //else
+    //{            
+        // diffuse
+        float diffuse = max(dot(normal,light),0.0);       
+        if (diffuse < 0.2)
+            color *=0.2;
+        else if (diffuse < 0.4)
+            color *=0.4;
+        else if (diffuse < 0.6)
+            color *=0.6;
+        else if(diffuse < 0.8)
+            color *=0.8;
+        else if(diffuse < 1.0)
+            color *=1.0;
+            
+        // spec (highest prio)
+        vec3 reflection = normalize(reflect(-eye, normal));
+        float spec = pow(max(0.0, dot(reflection, light)), 10.0); 
+        // more than half highlight intensity? 
+        if (spec > 0.5) 
+            color = vec3(1, 1, 1);
+   //}   
+
+   //return color * intensity;
+   return color;
+    
+}
+
+vec3 getColor() {
+            vec2 middle = vec2(0.5, 0.5);
+            middle = middle / density;
+
+            float localRadius = radius / density;            
+            float x1_y1 = 1.0 / density;
+            
+            middle = vec2(
+                    float(int(texCoordI.x/x1_y1)) * x1_y1 + middle.x,
+                    float(int(texCoordI.y/x1_y1)) * x1_y1 + middle.y 
+            );
+
+            if (distance(texCoordI, middle) < localRadius) {
+                return color;
+            } else {
+                return background;
+            }
+        }
+
+void main() {
+  gl_FragColor.rgb = toon(
+    normalize(normalW), 
+    normalize(eyeDirectionW), 
+    normalize(lightDirectionW), lightIntensity, getColor());
+  gl_FragColor.a = 1.0;
+}
+</script>
+
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
+    "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>GEA - Projekt: "Roundtris"</title> 
+        <script src="common/jquery-1.7.1.min.js"></script>
+        <link href="common/bootstrap/css/bootstrap.css" rel="stylesheet">
+        <style type="text/css">
+            body {
+                padding-top: 60px;
+                padding-bottom: 40px;
+            }
+        </style>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="common/bootstrap/bootstrap.js" type="text/javascript"></script>
+        <link rel="stylesheet" type="text/css" href="common/bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="common/bootstrap/css/bootstrap-responsive.min.css">      
+        <style type="text/css">
+            #error { display: none; }
+            #canvas { border: 1px solid black; }
+        </style>
+    </head>    
+    <body>
+    <header class="navbar navbar-fixed-top">
+        <div class="navbar-inner">
+            <div class="container">
+                <a class="btn btn-navbar" data-toggle="collapse"
+                   data-target=".nav-collapse"> <span class="icon-bar"></span> <span
+                        class="icon-bar"></span> <span class="icon-bar"></span> </a> <a
+                    class="brand" href="http://www.florian-oeser.de/">GEA - Projekt: "Roundtris"</a>
+                <div class="nav-collapse">
+                    <ul class="nav">
+                        <li class="active"><a href="index_expose.html">Exposé</a></li>
+                      <li><a href="index_prototyp.html">Prototyp</a></li>
+                        <li><a href="index_latest.html">latest version</a></li>  
+                           <li><a href="index_final.html">final</a></li> 
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+        
+    <div class="container">
+        <div class="page-header">        
+            <h1>Exposé</h1>     
+        </div>
+        
+        <pre id="error" class="alert alert-error"></pre> 
+        <p>Im Rahmen der Lehrveranstaltung <em>Game Engine Architecture</em> wird als Semesterprojekt ein Spiel entwickelt. Als Vorlage für das
+        Spiel soll ein Klassiker dienen. </p>
+        <h2>Die Spieleidee in drei Zeilen</h2>   
+        <p>Mein Spiel ist ein 3D-Klon des erfolgreichen Tetris-Spiels. Dabei wird das Spielfeld auf einen Zylinder gezogen. Es wird einen
+        Singleplayer mit Highscore geben wobei alle Spielregeln unverändert übernommen werden.</p>        
+        <h2>Tetris - das Original</h2>  
+        <p>Tetris ist ein 1984 von Alexei Paschitnow entwickeltes Spiel. Tetris gilt als der Klassiker schlechthin und ist das meistverkaufte
+        Spiel weltweit.<p/>
+        <div align="center"><p><img src="tetris_gameboy.jpg" alt="Tetris auf dem GameBoy"  width="25%" height="25%" /></p></div>        
+        <p>Einzeln vom oberen Rand des rechteckigen Spielfelds herunterfallende, stets aus vier Quadraten zusammengesetzte Formen (<em>Tetrominos</em>) müssen vom
+        Spieler so platziert werden, dass sie am unteren Rand horizontale, möglichst lückenlose Reihen bilden. Dabei hat der Spieler die
+        Möglichkeit die Tetrominos in 90-Grad-Schritten passend zu drehen. Sobald eine Reihe von Quadraten komplett ist, verschwindet sie und der Spieler bekommt Punkte;
+        alle darüberliegenden Reihen rücken nach unten und geben damit einen Teil des Spielfelds wieder frei. Werden mehrere Reihen auf einmal
+        getilgt erhält der Spieler eine höhere Punktzahl je Reihe. Das Spiel endet, sobald sich die nicht abgebauten Reihen bis zum oberen
+        Spielfeldrand aufgetürmt haben. Wenn eine bestimmte Gesamtzahl an Reihen entfernt worden ist, wird die Fall-Geschwindigkeit der
+        Tetrominos erhöht. Der Spieler erreicht das nächsthöhere Level. Ziel ist es, den erreichten Highscore-Wert immer weiter zu erhöhen. Es gibt
+        insgesamt sieben Tetrominos:</p>
+        <div align="center"><p><img src="tetrominos.png" alt="Alle sieben Tetrominos"  width="25%" height="25%" /></p></div>
+        <p>Neben dem eigentlichen Spielfeld ist eine Anzeige für die Punkte, das Level und für die Anzahl der bereits getilgten Reihen.</p>
+        
+        <h2>"Roundtris"</h2>  
+        <p>Wie eingangs erwähnt handelt es sich bei <em>Roundtris</em> um einen 3D-Klon, bei welchem das Spielfeld auf einen Zylinder gezogen wird. Alle
+        weiteren Spielelemente werden unverändert übernommen. Ein Prototyp, welchen ich für das Windows Phone entwickelt habe, ist im Folgenden 
+        zu sehen. Er zeigt den neuen Spielaufbau auf einem Zylinder. Da hierbei Tetrominios, welche im Vordergrund liegen andere Tetrominos im
+        Hindergrund verdecken können, werden die verdeckenden Tetrominos transparent gerendert.</p>        
+        <div align="center"><p><img src="roundtris_windowsphone.jpg" alt="Roundris-Prototyp auf dem Windows Phone"  width="25%" height="25%" /></p></div>        
+        <p>Das Spiel wird über die Tastatur gesteuert. Es wird mit den Pfeiltasten (<em>links/rechts</em>) der Zylinder gedreht. Mit <em>oben/unten</em>
+        wird das Tetromino rotiert. Mit Hilfe der Leertaste wird das Tetromino beschleunigt und sofort auf die Endposition gesetzt. Zusätzlich kann
+        über die Maus die Kameraposition geändert werden. Wie auch im Original wird es eine Anzeige für die Score, das Level und die getilgten Reihen 
+        geben. Zusätzlich lässt sich das Spiel pausieren und es wird ein Menü (<em>Starten, Fortsetzen, Credits, Beenden</em>) geben.</p>
+        <p>Es ist ein Hilfemodus geplant, welcher die aktuell finale Position des gerade fallenden Tetrominos anzeigt. An dieser Position
+        wird das Tetromino schattiert gerendert. Ist der Modus aktiviert gibt es jedoch weniger Punkte für den Spieler. Ein weiterer Hilfemodus wäre eine Art <em>Heightmap</em>,
+        welche das Spielfeld von top-down zeigt. Je mehr Platz an einer Stelle ist bzw. wie "tief" das Spielfeld dort ist, wird über eine Farbe
+        zwischen Grün und Rot visualisiert. Dieser Ansatz müsste aber zunächst prototypisch getestet werden.</p>
+        <p>Weiterhin wäre ein <em>Time-Trial-Modus</em> denkbar, bei dem soviele Punkte wie möglich in einer vorgebenen Zeit geschafft werden müssen.</p>
+        <p>Sobald eine spielbare Version vorliegt wird das Spiel gepolisht.</p> 
+        
+        <h2>Resourcen</h2>        
+        <ul>           
+            <li><a href="https://docs.google.com/presentation/d/1CSSYTqqeS91JswBQT69Sf762aalfJm8M1QL1y8bYzog/edit?usp=sharing"
+                   target="_blank">Präsentation</a>
+            </li>
+        </ul>
+    </div>
+</body>
+</html>

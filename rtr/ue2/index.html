@@ -1,0 +1,349 @@
+<html>
+
+    <head>
+        <title>Real-Time-Rendering Übung 2</title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+        <script type="text/javascript" src="/rtr/ue2/glMatrix-0.9.5.min.js"></script>
+        <script type="text/javascript" src="/rtr/ue2/webgl-utils.js"></script>
+        <script type="text/javascript" src="/rtr/ue2/sphere.js"></script>
+
+        <script id="shader-fs" type="x-shader/x-fragment">precision mediump float;
+
+            varying vec4 vColor;
+
+            void main(void) {
+            gl_FragColor = vColor;
+            }</script>
+
+        <script id="shader-vs" type="x-shader/x-vertex">attribute vec3 aVertexPosition;
+            attribute vec4 aVertexColor;
+
+            uniform mat4 uMVMatrix;
+            uniform mat4 uPMatrix;
+
+            varying vec4 vColor;
+
+            void main(void) {
+            gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+            vColor = aVertexColor;
+            }</script>
+
+
+        <script type="text/javascript">
+
+            var gl;
+            var sphere;
+            var isWireFrameEnabled = false;
+            var recursionDepth = 5;
+
+            function initGL(canvas) {
+                try {
+                    gl = canvas.getContext("experimental-webgl");
+                    gl.viewportWidth = canvas.width;
+                    gl.viewportHeight = canvas.height;
+                } catch (e) {
+                }
+                if (!gl) {
+                    alert("Could not initialise WebGL, sorry :-(");
+                }
+            }
+
+
+            function getShader(gl, id) {
+                var shaderScript = document.getElementById(id);
+                if (!shaderScript) {
+                    return null;
+                }
+
+                var str = "";
+                var k = shaderScript.firstChild;
+                while (k) {
+                    if (k.nodeType == 3) {
+                        str += k.textContent;
+                    }
+                    k = k.nextSibling;
+                }
+
+                var shader;
+                if (shaderScript.type == "x-shader/x-fragment") {
+                    shader = gl.createShader(gl.FRAGMENT_SHADER);
+                } else if (shaderScript.type == "x-shader/x-vertex") {
+                    shader = gl.createShader(gl.VERTEX_SHADER);
+                } else {
+                    return null;
+                }
+
+                gl.shaderSource(shader, str);
+                gl.compileShader(shader);
+
+                if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                    alert(gl.getShaderInfoLog(shader));
+                    return null;
+                }
+
+                return shader;
+            }
+
+
+            var shaderProgram;
+
+            function initShaders() {
+                var fragmentShader = getShader(gl, "shader-fs");
+                var vertexShader = getShader(gl, "shader-vs");
+
+                shaderProgram = gl.createProgram();
+                gl.attachShader(shaderProgram, vertexShader);
+                gl.attachShader(shaderProgram, fragmentShader);
+                gl.linkProgram(shaderProgram);
+
+                if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+                    alert("Could not initialise shaders");
+                }
+
+                gl.useProgram(shaderProgram);
+
+                shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
+                gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
+
+                shaderProgram.vertexColorAttribute = gl.getAttribLocation(shaderProgram, "aVertexColor");
+                gl.enableVertexAttribArray(shaderProgram.vertexColorAttribute);
+
+                shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
+                shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
+            }
+
+
+            var mvMatrix = mat4.create();
+            var mvMatrixStack = [];
+            var pMatrix = mat4.create();
+
+            function mvPushMatrix() {
+                var copy = mat4.create();
+                mat4.set(mvMatrix, copy);
+                mvMatrixStack.push(copy);
+            }
+
+            function mvPopMatrix() {
+                if (mvMatrixStack.length == 0) {
+                    throw "Invalid popMatrix!";
+                }
+                mvMatrix = mvMatrixStack.pop();
+            }
+
+
+            function setMatrixUniforms() {
+                gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix);
+                gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
+            }
+
+
+            function degToRad(degrees) {
+                return degrees * Math.PI / 180;
+            }
+            
+            var rPyramid = 0;
+            var rCube = 0;
+
+            function drawScene() {
+                gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+                gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+                mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, pMatrix);
+
+                mat4.identity(mvMatrix);
+
+                mat4.translate(mvMatrix, [-1.5, 0.0, -8.0]);
+                
+                mvPushMatrix();
+                mat4.rotate(mvMatrix, degToRad(rPyramid), [0, 1, 0]);		
+                // draw left sphere
+                sphere.draw(isWireFrameEnabled);                
+                mvPopMatrix();
+
+                mat4.translate(mvMatrix, [3.0, 0.0, 0.0]);   
+                // scale the right spheres to 50%
+                mat4.scale(mvMatrix, [0.5,0.5,0.5]);
+                mat4.rotate(mvMatrix, degToRad(rCube), [1, 1, 1]);
+                // four spheres aligned z=0
+                mvPushMatrix();  
+                mat4.translate(mvMatrix, [1.0, 0.0, 0.0]);   
+                sphere.draw(isWireFrameEnabled);
+                mvPopMatrix();
+                mvPushMatrix();  
+                mat4.translate(mvMatrix, [-1.0, 0.0, 0.0]);   
+                sphere.draw(isWireFrameEnabled);
+                mvPopMatrix();
+                mvPushMatrix();  
+                mat4.translate(mvMatrix, [1.0, 2.0, 0.0]);   
+                sphere.draw(isWireFrameEnabled);
+                mvPopMatrix();
+                mvPushMatrix();  
+                mat4.translate(mvMatrix, [-1.0, 2.0, 0.0]);   
+                sphere.draw(isWireFrameEnabled);
+                mvPopMatrix();
+                // four spheres aligned z=-2
+                mvPushMatrix();  
+                mat4.translate(mvMatrix, [1.0, 0.0, -2.0]);   
+                sphere.draw(isWireFrameEnabled);
+                mvPopMatrix();
+                mvPushMatrix();  
+                mat4.translate(mvMatrix, [-1.0, 0.0, -2.0]);   
+                sphere.draw(isWireFrameEnabled);
+                mvPopMatrix();
+                mvPushMatrix();  
+                mat4.translate(mvMatrix, [1.0, 2.0, -2.0]);   
+                sphere.draw(isWireFrameEnabled);
+                mvPopMatrix();
+                mvPushMatrix();  
+                mat4.translate(mvMatrix, [-1.0, 2.0, -2.0]);   
+                sphere.draw(isWireFrameEnabled);
+                mvPopMatrix();
+            }
+
+
+            var lastTime = 0;
+	
+
+            function animate() {
+                var timeNow = new Date().getTime();
+                if (lastTime != 0) {
+                    var elapsed = timeNow - lastTime;
+
+                    rPyramid += (90 * elapsed) / 1000.0;
+                    rCube -= (75 * elapsed) / 1000.0;
+                }
+                lastTime = timeNow;
+            }
+
+
+            function tick() {
+                requestAnimFrame(tick);
+                drawScene();
+                animate();
+            }
+            
+            var currentlyPressedKeys = {};            
+
+            function handleKeyDown(event) {
+                currentlyPressedKeys[event.keyCode] = true;
+
+                if (String.fromCharCode(event.keyCode) == "W") {
+                    if(isWireFrameEnabled)
+                        isWireFrameEnabled = false;
+                    else
+                        isWireFrameEnabled = true;                    
+                }
+                else if(String.fromCharCode(event.keyCode) == "U") {
+                    if(recursionDepth < 5)
+                    {
+                        recursionDepth += 1;
+                        sphere = new Sphere(recursionDepth);
+                    }
+                }
+                else if(String.fromCharCode(event.keyCode) == "D") {
+                    if(recursionDepth > 1)
+                    {
+                        recursionDepth -= 1;
+                        sphere = new Sphere(recursionDepth);
+                    }
+                   
+                }
+            }
+
+            function handleKeyUp(event) {
+                currentlyPressedKeys[event.keyCode] = false;
+            }
+
+            function webGLStart() {
+                var canvas = document.getElementById("lesson04-canvas");
+		
+                initGL(canvas);
+                initShaders();                         
+                sphere = new Sphere(recursionDepth);                
+                gl.clearColor(0.0, 0.0, 0.0, 1.0);
+                gl.enable(gl.DEPTH_TEST);
+                
+                document.onkeydown = handleKeyDown;
+                document.onkeyup = handleKeyUp;
+
+                tick();
+            }
+
+        </script>
+
+
+    </head>
+
+
+    <body onload="webGLStart();">
+        <h1>Lösung zur Ü2: Learning WebGL – Tesselation</h1>
+        <p><a href="#section1">Erläuterungen zur Übung</a>
+            <a href="#section2">Verwendete Ressourcen und Quellcode</a>
+
+         
+            <canvas id="lesson04-canvas" style="border: none;" width="500" height="500"></canvas>       
+            </p>
+<h2>Controls:</h2>
+
+            <ul>
+                <li>
+<code>D</code>/<code>U</code> verringern/erhöhen der Rekursionstiefe (min: 1; max: 5; default: 5)       
+                </li>
+<li>
+<code>w</code> wireframe ein/aus
+            </li>
+</ul>
+               
+
+
+        <h2><a name="section1">Erläuterungen zur Übung</a></h2>
+        <p>In dieser Übung wurde eine Kugeloberfläche durch rekursive Dreieckstessellation konstruiert.
+            Ausgehend von einem Tetraeder (vierseitiger Körper, dessen Seitenflächen jeweils kongruente gleichseitige Dreiecke sind), werden dessen
+            Dreiecke in jedem Rekursionschritt in vier weitere, gleichgroße Dreicke zerlegt, indem jeweils die Seitenhalbierenden des entsprechenden Dreickes
+            verbunden werden (siehe Bild 1).</p>
+        <div align="center">            
+            <img src="/rtr/ue2/tessellation_single_triangle.jpg" width="15%" style="margin:auto;display:block;" alt="Tessellation eines Dreickes über dessen Seitenhalbierenden" title="Tessellation eines Dreickes über dessen Seitenhalbierenden">
+            Bild 1: Tessellation eines Dreickes über dessen Seitenhalbierenden
+        </div>
+        <p>Je höher die gewählte Rekursiontiefe ist, desto mehr nähert sich die entstehende Geometrie einer Kugeloberfläche an (siehe Bild 2).
+            Zu beachten ist das exponentielle Wachstum an Dreiecken in der Größenordnung von 4<sup>Rekursionstiefe+1</sup>.</p>
+        <div align="center">            
+            <img src="/rtr/ue2/triangletessellation.jpg" width="25%" style="margin:auto;display:block;" alt="Tessellation einer Kugeloberfläche mit Dreiecken" title="Tessellation einer Kugeloberfläche mit Dreiecken">
+            Bild 2: Tessellation einer Kugeloberfläche mit Dreiecken
+        </div>
+        <p><i>Verwendete Technologien: webGL in einer HTML5 Canvas eingebettet und Javascript.</i>
+        </p>
+        <p>Falls der Browser, mit dem diese Seite (die Canvas) betrachtet wird, kein webGL unterstützt, zeigen die folgenden Bilder
+            jeweils nocheinmal die Ergebnisse mit unterschiedlichen Rekursionstiefen.</p> 
+
+        <table width="100%" height="100%" border="0" cellpadding="30" cellspacing="30">
+            <tr>
+                <td align="center" width="50%">Rekursionstiefe von 1<br><img src="/rtr/ue2/recursiondepth_1.jpg" alt="Rekursionstiefe von 1" width="100%" title="Rekursionstiefe von 1">
+</td>
+                <td align="center" width="50%">Rekursionstiefe von 2<br><img src="/rtr/ue2/recursiondepth_2.jpg" alt="Rekursionstiefe von 2" width="100%" title="Rekursionstiefe von 2">
+</td>
+            </tr>
+            <tr>
+                <td align="center" width="50%">Rekursionstiefe von 3<img src="/rtr/ue2/recursiondepth_3.jpg" alt="Rekursionstiefe von 3" width="100%" title="Rekursionstiefe von 3">
+</td>
+                <td align="center" width="50%">Rekursionstiefe von 4<img src="/rtr/ue2/recursiondepth_4.jpg" alt="Rekursionstiefe von 4" width="100%" title="Rekursionstiefe von 4">
+</td>
+            </tr>
+            <tr>
+
+                <td align="center" width="50%">Rekursionstiefe von 5<img src="/rtr/ue2/recursiondepth_5.jpg" alt="Rekursionstiefe von 5" width="100%" title="Rekursionstiefe von 5">
+</td>
+            </tr>
+        </table>
+        <h2><a name="section2">Verwendete Ressourcen und Quellcode</a></h2>
+        <p>Bibliotheken: webgl-utils, glMatrix-0.9.5.min
+            Verwendete Resourcen: <a href="http://www.stephan-brumme.com/studies/grafik.html">Tessellation einer Kugel von Stephan Brumme</a>,
+            <a href="http://musingsofninjarat.wordpress.com/spheres-through-triangle-tessellation/">Spheres Through Triangle Tessellation</a>,
+            <a href="http://learningwebgl.com/blog/?p=370">WebGL Lesson 4 – some real 3D objects</a>
+            Quellcode: <a href="/rtr/ue2/ue2.rar">ue2.rar</a>
+        </p>
+
+    </body>
+
+</html>

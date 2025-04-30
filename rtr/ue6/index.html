@@ -1,0 +1,101 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>Lösung zur Ü5: Multi-Pass Rendering</title>
+            
+        <script src="/rtr/ue6/three.min.js"></script>
+      <script src="/rtr/ue6/FlyControls.js"></script>  
+    
+        <script src="/rtr/common/jquery-1.7.1.min.js"></script>
+        
+            
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">        
+        <link rel="stylesheet" type="text/css" href="/rtr/common/bootstrap/css/bootstrap.min.css">         
+        <link rel="stylesheet" type="text/css" href="/rtr/common/bootstrap/css/bootstrap-responsive.min.css">
+            
+        <style type="text/css">body {
+                padding-top: 60px;
+                padding-bottom: 40px;
+            }</style>
+            
+        <style type="text/css">#error { display: none; }
+            #canvas { border: 1px solid black; }</style>
+            
+      <!--  <script type="text/javascript" src="entity.js"></script>
+        <script type="text/javascript" src="index.js"></script> -->
+        <script type="text/javascript" src="/rtr/ue6/heightmap.js"></script> 
+       <script type="text/javascript" src="/rtr/ue6/index.js"></script>
+    </head>
+        
+    <body>
+    <header class="navbar navbar-fixed-top">
+        <div class="navbar-inner">
+            <div class="container">
+                <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </a> <a class="brand" href="/2012/04/23/losungen-vl-real-time-rendering/">Aufgaben-Übersicht RTR</a>
+                <div class="nav-collapse">
+                    <ul class="nav">
+                        <li class="active"><a href="/rtr/ue6/index.html">Aufgabe 6: Abschlussaufgabe</a></li> 
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="container">
+       <div class="page-header">
+            <h1>Aufgabe 6: Terrain-Rendering</h1>
+        </div>
+            ´
+             <pre id="error" class="alert alert-error"></pre>
+             <h2>Aufgabenstellung</h2> 
+        <p>Entwerfen und implementieren Sie eine WebGL Demoanwendung, die einige der in diesem Modul vorgestellten Techniken verwendet.
+            Die Demo soll ihre Fähigkeit demonstrieren, interessante Shader-Effekte zu erstellen und in einer <em>minimalen</em> Anwendung sinnvoll
+            zu integrieren.</p>
+       
+        <p>Ich habe mich für die Erstellung eines Heightmap-Terrains, mit Skybox und reflektierender Wassseroberfläche entschieden.</p>
+       
+        <div id="canvas-container">
+            <p><canvas id="canvas" width="800" height="600"></canvas></p>
+        </div>
+   
+        <h2>Erläuterungen zur Übung</h2>      
+        <p>            
+            Im Gegensatz zu den vorherigen Übungen habe ich statt <em>TDL</em> hier das <em>three.js</em> Framework verwendet.
+        </p>       
+         <p>            
+            Das Terrain wird aus einer Plane und einer Heightmap (Graustufen-Textur; siehe unten) erzeugt. Die Plane ist dabei entsprechend
+            der Heightmap-Größe tesseliert, sodass jeder Grauwert aus der Textur einem Vertex zugeordnet werden kann. Genauer gesagt
+            wird nur die y-Koordinate eines jeden Vertex verändert, sodass sich aus der flachen Plane ein Terrain formen kann. Je heller/größer 
+            der Farbwert eines Pixels ist, desto höher wird auch der Vertex gesetzt.           
+        </p>      
+        <div align="center"><p><img src="/rtr/ue6/heightmaps/h1.jpg" alt="Heightmap"></p></div>
+        
+    <h2>Verwendete Ressourcen und Quellcode</h2>
+    <ul>
+        Ressourcen      
+        <li>
+<a href="http://twitter.github.com/bootstrap/" target="_blank">Bootstrap CSS für das Layout</a>
+        </li>
+        <li>
+<a href="http://mrdoob.github.com/three.js/" target="_blank">threejs, JavaScript 3D library</a>
+        </li>
+        Tutorials/Weblinks
+        <li>
+<a href="http://oos.moxiecode.com/js_webgl/terrain/index.html" target="_blank">Terrain Beispielimplementierung mit ThreeExtras.js</a>
+        </li> 
+        <li>
+<a href="http://mrdoob.github.com/three.js/examples/webgl_geometry_terrain.html" target="_blank">Terrain Demo</a>
+        </li>       
+        Quellcode           
+        <li>
+<a href="/rtr/ue5/ue6.rar" target="_blank">Quellcode Ü6</a>
+        </li>       
+    </ul>
+</div>
+    
+</body>
+
+
+
+
+</html>

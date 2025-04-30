@@ -1,0 +1,281 @@
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc
+END
+tdl.programs.html
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.programs.html
+END
+tdl.primitives.html
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.primitives.html
+END
+tdl.fast.rowMajor.html
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.fast.rowMajor.html
+END
+tdl.fast.html
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.fast.html
+END
+tdl.textures.CubeMap.html
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.textures.CubeMap.html
+END
+tdl.particles.Trail.html
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.particles.Trail.html
+END
+tdl.programs.Program.html
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.programs.Program.html
+END
+tdl.html
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.html
+END
+tdl.fullscreen.html
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.fullscreen.html
+END
+tdl.particles.ParticleSpec.html
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.particles.ParticleSpec.html
+END
+tdl.loader.html
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.loader.html
+END
+tdl.string.html
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.string.html
+END
+tdl.framebuffers.html
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.framebuffers.html
+END
+tdl.textures.Texture2D.html
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.textures.Texture2D.html
+END
+tdl.quaternions.html
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.quaternions.html
+END
+tdl.base.html
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.base.html
+END
+tdl.loader.Loader.html
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.loader.Loader.html
+END
+tdl.textures.ExternalTexture2D.html
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.textures.ExternalTexture2D.html
+END
+tdl.textures.SolidTexture.html
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.textures.SolidTexture.html
+END
+tdl.math.columnMajor.html
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.math.columnMajor.html
+END
+tdl.log.html
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.log.html
+END
+tdl.textures.ColorTexture.html
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.textures.ColorTexture.html
+END
+tdl.models.Model.html
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.models.Model.html
+END
+tdl.fast.columnMajor.html
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.fast.columnMajor.html
+END
+tdl.sync.SyncManager.html
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.sync.SyncManager.html
+END
+tdl.models.html
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.models.html
+END
+tdl.textures.ExternalTexture.html
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.textures.ExternalTexture.html
+END
+tdl.fps.html
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.fps.html
+END
+tdl.misc.html
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.misc.html
+END
+tdl.buffers.html
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.buffers.html
+END
+tdl.particles.ParticleSystem.html
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.particles.ParticleSystem.html
+END
+tdl.webgl.html
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.webgl.html
+END
+tdl.io.LoadInfo.html
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.io.LoadInfo.html
+END
+tdl.shader.html
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.shader.html
+END
+tdl.io.html
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.io.html
+END
+tdl.textures.DepthTexture.html
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.textures.DepthTexture.html
+END
+tdl.sync.html
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.sync.html
+END
+global.html
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/global.html
+END
+tdl.math.matrix4.html
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.math.matrix4.html
+END
+tdl.fps.FPSTimer.html
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.fps.FPSTimer.html
+END
+tdl.textures.html
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.textures.html
+END
+tdl.fast.matrix4.html
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.fast.matrix4.html
+END
+index.html
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/index.html
+END
+tdl.particles.html
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.particles.html
+END
+tdl.math.rowMajor.html
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.math.rowMajor.html
+END
+tdl.math.html
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/uni/!svn/ver/83/SS12/RealTimeRendering/tdl/tdl-doc/tdl.math.html
+END
